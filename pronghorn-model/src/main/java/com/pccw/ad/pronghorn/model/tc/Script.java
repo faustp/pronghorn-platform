@@ -1,5 +1,6 @@
 package com.pccw.ad.pronghorn.model.tc;
 
+import com.pccw.ad.pronghorn.model.profile.Selector;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -12,7 +13,7 @@ public class Script implements Serializable {
 
     private static final long serialVersionUID = 200614354L;
     private String action;
-    private String objectKey;
+    private Selector objectKey;
     private String inputData;
     private String description;
 
@@ -20,7 +21,7 @@ public class Script implements Serializable {
     public Script() {
     }
 
-    public Script(String description, String objectKey, String action, String inputData) {
+    public Script(String description, Selector objectKey, String action, String inputData) {
         this.action = action;
         this.objectKey = objectKey;
         this.inputData = inputData;
@@ -35,11 +36,11 @@ public class Script implements Serializable {
         this.description = description;
     }
 
-    public String getObjectKey() {
+    public Selector getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(String objectKey) {
+    public void setObjectKey(Selector objectKey) {
         this.objectKey = objectKey;
     }
 
