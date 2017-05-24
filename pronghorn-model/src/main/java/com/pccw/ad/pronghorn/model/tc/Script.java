@@ -13,7 +13,7 @@ public class Script implements Serializable {
 
     private static final long serialVersionUID = 200614354L;
     private String action;
-    private Selector objectKey;
+    private String objectKey;
     private String inputData;
     private String description;
 
@@ -21,7 +21,7 @@ public class Script implements Serializable {
     public Script() {
     }
 
-    public Script(String description, Selector objectKey, String action, String inputData) {
+    public Script(String description, String objectKey, String action, String inputData) {
         this.action = action;
         this.objectKey = objectKey;
         this.inputData = inputData;
@@ -36,11 +36,11 @@ public class Script implements Serializable {
         this.description = description;
     }
 
-    public Selector getObjectKey() {
+    public String getObjectKey() {
         return objectKey;
     }
 
-    public void setObjectKey(Selector objectKey) {
+    public void setObjectKey(String objectKey) {
         this.objectKey = objectKey;
     }
 

@@ -14,7 +14,6 @@ public class WSClientTest {
     @Test
     public void testClient(){
         WSClient wsClient = new WSClient("host","port");
-        wsClient.getAllTestCaseByProjectName("");
     }
 
 }
