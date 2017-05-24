@@ -71,7 +71,7 @@ public class MessageFactory {
     private static List<Script> generateScript(int count) {
         List<Script> scripts = new ArrayList<>();
         for (int ctr = 0; ctr <= count; ctr++) {
-            Script script = new Script(generateString(), generateString(), generateString(), generateString());
+            Script script = new Script(generateString(), new Selector(), generateString(), generateString());
             scripts.add(script);
         }
         return scripts;

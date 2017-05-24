@@ -30,6 +30,8 @@ public class WSClient {
     public static final String TESTCASE_PATH_URL = "tcs";
     public static final String PROFILE_PATH_URL = "profiles";
     public static final String SCRIPT_PATH_URL = "scripts";
+    public static final String SEPARATOR = "/";
+    public static final String HTTP = "http://";
 
     public static RestTemplate restTemplate = new RestTemplate();
     public String host = null;
@@ -40,86 +42,125 @@ public class WSClient {
         this.port = port;
     }
 
+    public void main (String[] args) throws IOException {
+        getAllProfiles();
+    }
+
     public Script getTestScript(String profileName, String testCaseId, String scriptId) throws IOException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator  + profileName
-                + File.separator + TESTCASE_PATH_URL + File.separator + testCaseId + File.separator + SCRIPT_PATH_URL
-                + File.separator + scriptId;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + SEPARATOR  + profileName
+                + SEPARATOR + TESTCASE_PATH_URL + SEPARATOR + testCaseId + SEPARATOR + SCRIPT_PATH_URL
+                + SEPARATOR + scriptId;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<Script> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        Script script = om.readValue(response.getBody(), new TypeReference<Script>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return script;
+        logger.info("response " + response.getResult());
+        return response.getResult();
     }
 
     public List<Script> getAllTestScripts(String profileName, String testCaseId) throws IOException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator  + profileName
-                + File.separator + TESTCASE_PATH_URL + File.separator + testCaseId + File.separator + SCRIPT_PATH_URL;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + SEPARATOR  + profileName
+                + SEPARATOR + TESTCASE_PATH_URL + SEPARATOR + testCaseId + SEPARATOR + SCRIPT_PATH_URL;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<List<Script>> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        List<Script> scripts = om.readValue(response.getBody(), new TypeReference<List<Script>>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return scripts;
+        logger.info("response " + response.getResult());
+        return response.getResult();
     }
-
+//TODO
     public TestCase getTestCase(String profileName, String testCaseId) throws IOException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator  + profileName
-                + File.separator + TESTCASE_PATH_URL + File.separator + testCaseId;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + SEPARATOR  + profileName
+                + SEPARATOR + TESTCASE_PATH_URL + SEPARATOR + testCaseId;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<TestCase> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        TestCase testCase = om.readValue(response.getBody(), new TypeReference<TestCase>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return testCase;
+        logger.info("response " + response.getResult());
+        return response.getResult();
     }
 
     public List<TestCase> getAllTestCases(String profileName) throws IOException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator  + profileName
-                + File.separator + TESTCASE_PATH_URL;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + SEPARATOR  + profileName
+                + SEPARATOR + TESTCASE_PATH_URL;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<List<TestCase>> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        List<TestCase> testCases = om.readValue(response.getBody(), new TypeReference<List<TestCase>>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return testCases;
+        logger.info("response " + response.getResult());
+        return response.getResult();
     }
 
     public Profile getProfile(String profileName) throws IOException, MessageSerializerException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator  + profileName;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + SEPARATOR  + profileName;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<Profile> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        Profile profile = om.readValue(response.getBody(), new TypeReference<Profile>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return profile;
+        logger.info("response " + response.getCode());
+        return response.getResult();
     }
 
     public List<Profile> getAllProfiles() throws IOException {
-        String resourceURL = host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL + File.separator;
+        String resourceURL = HTTP + host + ":" + port + BASE_PATH_URL + PROFILE_PATH_URL;
         logger.info("resourceURL " + resourceURL);
-        ResponseEntity<String> response = restTemplate.getForEntity(resourceURL, String.class);
+        ResponseMessage<List<Profile>> response = restTemplate.getForObject(resourceURL,ResponseMessage.class);
 
-        ObjectMapper om = new ObjectMapper();
-        List<Profile> profiles = om.readValue(response.getBody(), new TypeReference<List<Profile>>(){
-        });
-        logger.info("response " + response.getBody());
+        if(response == null)
+            return null;
 
-        return profiles;
+        logger.info("response " + response.getCode());
+        return response.getResult();
     }
+
+    public static class ResponseMessage<T> {
+
+        private int code;
+        private String message;
+        private T result;
+
+        public ResponseMessage() {
+        }
+
+        public ResponseMessage(int code, String message, T result) {
+            this.code = code;
+            this.message = message;
+            this.result = result;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public T getResult() {
+            return result;
+        }
+
+        public void setResult(T result) {
+            this.result = result;
+        }
+    }
+
 }

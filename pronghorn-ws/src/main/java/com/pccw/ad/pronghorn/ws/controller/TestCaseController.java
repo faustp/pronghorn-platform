@@ -33,13 +33,13 @@ public class TestCaseController {
 
     @RequestMapping(path = "/{name}/tcs/{testId}", method = GET, produces = APPLICATION_JSON_VALUE, name = "Get Scripts")
     public ResponseMessage<TestCase> getTestCase(@PathVariable String name, @PathVariable String testId) {
-        return null;
+        return testCaseService.getTestCase(testId);
     }
 
     @RequestMapping(path = "/{name}/tcs/{testId}", method = PUT, produces = APPLICATION_JSON_VALUE, name = "Get Scripts")
     public ResponseMessage<TestCase> updateTestCase(@PathVariable String name, @PathVariable String testId,
                                                     @RequestBody TestCase testCase) {
-        return null;
+        return testCaseService.updateTestCase(testCase);
     }
 
     @RequestMapping(path = "/{name}/tcs", method = POST, consumes = APPLICATION_JSON_VALUE, name = "Add Test Case")
