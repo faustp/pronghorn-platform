@@ -17,6 +17,7 @@ public class Profile implements Nameable, Serializable {
 
     @Indexed
     private String name;
+    private String description;
     private LinkedHashSet<Service> services;
     private Selector selector;
 
@@ -29,6 +30,14 @@ public class Profile implements Nameable, Serializable {
             throw new ProfileException("services in Profile must not be null or empty");
         this.name = name;
         this.services = services;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LinkedHashSet<Service> getServices() {
@@ -62,6 +71,7 @@ public class Profile implements Nameable, Serializable {
     public String toString() {
         return "Profile{" +
                 "name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 ", services=" + services +
                 ", selector=" + selector +
                 '}';

@@ -379,11 +379,10 @@ public class ActionKeywords {
                 }
             }
             logger.info("isContentEqualsTo [" + object + "]" + "[" + data + "]");
-        } catch (Exception ex) {
+        } catch (NoSuchElementException nsee) {
             report.log(LogStatus.ERROR, description, data);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(nsee);
+            throw nsee;
         }
     }
 
@@ -404,11 +403,10 @@ public class ActionKeywords {
                 report.log(LogStatus.FAIL, description, data);
             }
             logger.info("isContentContains [" + object + "]" + "[" + data + "]");
-        } catch (Exception ex) {
+        } catch (NoSuchElementException nsee) {
             report.log(LogStatus.ERROR, description, data);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(nsee);
+            throw nsee;
         }
     }
 
@@ -434,11 +432,10 @@ public class ActionKeywords {
             REPOSITORY.put(data, info);
             report.log(LogStatus.INFO, description, data);
             logger.info("storeInfo [" + object + "]" + "[" + data + "]");
-        } catch (Exception ex) {
+        } catch (NoSuchElementException nsee) {
             report.log(LogStatus.ERROR, description, data);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(nsee);
+            throw nsee;
         }
     }
 
@@ -457,9 +454,8 @@ public class ActionKeywords {
             logger.info("retrieveInfo [" + object + "]" + "[" + data + "]");
         } catch (Exception ex) {
             report.log(LogStatus.ERROR, description, data);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(ex);
+            throw ex;
         }
     }
 
@@ -484,9 +480,8 @@ public class ActionKeywords {
             logger.info("validateAttributeValue [" + object + "]" + "[" + data + "]");
         } catch (Exception ex) {
             report.log(LogStatus.ERROR, description, "");
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(ex);
+            throw ex;
         }
     }
 
@@ -522,25 +517,25 @@ public class ActionKeywords {
             logger.info("validateStoredInfo [" + object + "]" + "[" + data + "]");
         } catch (Exception ex) {
             report.log(LogStatus.ERROR, description, data);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+            logger.error(ex);
+            throw ex;
         }
     }
 
     public static void waitUntil(IExtentTestClass report, String description, String testCaseId,
-                                 String object, String data) {
+                                 String object, String data) throws InterruptedException {
+
+        WebDriverWait wait = new WebDriverWait(WEB_DRIVER, 90);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(SELECTOR.get(object))));
         try {
-            WebDriverWait wait = new WebDriverWait(WEB_DRIVER, 90);
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(SELECTOR.get(object))));
             Thread.sleep(1000);
             logger.info("waitUntil [" + object + "]" + "[" + data + "]");
-        } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description);
-            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
-            logger.error(ake);
-            throw ake;
+        } catch (InterruptedException e) {
+            logger.error(e);
+            throw e;
         }
+
+
     }
 
     public static void updateSubscription(IExtentTestClass report, String description, String testCaseId,

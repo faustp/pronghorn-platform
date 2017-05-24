@@ -21,6 +21,7 @@ public class TestCase implements Serializable {
 
     @Id
     @Indexed
+    private String id;
     private String identifier;
     private String objective;
     private String preCondition;
@@ -105,6 +106,18 @@ public class TestCase implements Serializable {
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override

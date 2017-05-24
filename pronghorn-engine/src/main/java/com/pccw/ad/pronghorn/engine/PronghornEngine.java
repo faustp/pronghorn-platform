@@ -6,6 +6,7 @@ import com.pccw.ad.pronghorn.model.exception.ProfileException;
 import com.pccw.ad.pronghorn.model.profile.Profile;
 import com.pccw.ad.pronghorn.model.profile.Service;
 import com.pccw.ad.pronghorn.model.tc.Script;
+import com.pccw.ad.pronghorn.model.tc.Status;
 import com.pccw.ad.pronghorn.model.tc.TestCase;
 import com.relevantcodes.extentreports.DisplayOrder;
 import com.relevantcodes.extentreports.ExtentReports;
@@ -32,7 +33,7 @@ public final class PronghornEngine extends PronghornEngineAbs {
     }
 
     @Override
-    public void execute() throws ProfileException, InvocationTargetException, IllegalAccessException, IOException, FindFailed {
+    public void execute() throws InvocationTargetException, IllegalAccessException, FindFailed, IOException {
         ActionKeywords actionKeywords = new ActionKeywords();
         this.methods = actionKeywords.getClass().getMethods();
 
@@ -47,18 +48,19 @@ public final class PronghornEngine extends PronghornEngineAbs {
                 for (Script script : testCase.getScripts()) {
                     try {
                         executeScript(TEST, script, testCase.getIdentifier());
-                    } catch (InvocationTargetException | IllegalAccessException exception) {
+                    } catch (InvocationTargetException | IllegalAccessException | FindFailed | IOException exception) {
                         logger.error(exception);
                         if (ActionKeywords.WEB_DRIVER != null) {
                             ActionKeywords.WEB_DRIVER.quit();
                         }
+                        testCase.setStatus(Status.ERROR);
                         clearResources();
                         throw exception;
                     }
                 }
+                testCase.setStatus(Status.PASS);
                 clearResources();
             }
         }
     }
-
 }

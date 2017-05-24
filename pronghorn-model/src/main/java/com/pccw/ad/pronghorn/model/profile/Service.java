@@ -2,6 +2,9 @@ package com.pccw.ad.pronghorn.model.profile;
 
 import com.pccw.ad.pronghorn.model.exception.ServiceException;
 import com.pccw.ad.pronghorn.model.tc.TestCase;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,11 +14,16 @@ import java.util.Set;
 /**
  * Created by FaustineP on 06/04/2017.
  */
+@Document
 public class Service implements Nameable, Serializable {
 
     private static final long serialVersionUID = 200614354L;
 
+    @Id
+    @Indexed
+    private String id;
     private String name;
+    private String description;
     private HashSet<TestCase> testCases;
 
     public Service() {
@@ -37,6 +45,15 @@ public class Service implements Nameable, Serializable {
         this.testCases = testCases;
     }
 
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public void setName(String name) {
         this.name = name;
@@ -51,6 +68,7 @@ public class Service implements Nameable, Serializable {
     public String toString() {
         return "Service{" +
                 "name='" + name + '\'' +
+                ", description='" + description + '\'' +
                 ", testCases=" + testCases +
                 '}';
     }

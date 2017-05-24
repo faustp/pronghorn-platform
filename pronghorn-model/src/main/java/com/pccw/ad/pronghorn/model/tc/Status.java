@@ -5,5 +5,5 @@ package com.pccw.ad.pronghorn.model.tc;
  */
 public enum Status {
 
-    FAILED, PASSED
+    FAIL, PASS, ERROR
 }

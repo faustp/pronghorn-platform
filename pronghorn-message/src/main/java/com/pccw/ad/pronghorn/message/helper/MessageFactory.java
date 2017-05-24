@@ -59,7 +59,7 @@ public class MessageFactory {
                     addAuthor(string).
                     addObjective(string).
                     addIsActive(true).
-                    addStatus(Status.PASSED).
+                    addStatus(Status.PASS).
                     addScripts(generateScript(generateNumber(1, 10))).
                     build();
             testCases.add(testCase);
