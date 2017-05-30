@@ -1,35 +1,43 @@
 package com.pccw.ad.pronghorn.model.profile;
 
-import com.pccw.ad.pronghorn.model.exception.ProfileException;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by FaustineP on 28/03/2017.
  */
-@Document
+@Entity
+@Table(name = "TBL_PROFILE")
 public class Profile implements Nameable, Serializable {
 
     private static final long serialVersionUID = 200614354L;
 
-    @Indexed
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", unique = true, nullable = false)
+    private Long id;
+
+    @Column(name = "NAME", unique = true, nullable = false)
     private String name;
+
+    @Column(name = "DESCRIPTION")
     private String description;
-    private LinkedHashSet<Service> services;
-    private Selector selector;
+
+    @JoinColumn(name = "PROFILE_ID")
+    @OneToMany(fetch = FetchType.LAZY)
+    private Set<Service> services;
 
     public Profile() {
     }
 
-    public Profile(String name, LinkedHashSet<Service> services) throws ProfileException {
-        if (name == null || name.isEmpty()) throw new ProfileException("name in Profile must not be null pr empty");
-        if (services == null || services.isEmpty())
-            throw new ProfileException("services in Profile must not be null or empty");
-        this.name = name;
-        this.services = services;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDescription() {
@@ -40,21 +48,12 @@ public class Profile implements Nameable, Serializable {
         this.description = description;
     }
 
-    public LinkedHashSet<Service> getServices() {
+    public Set<Service> getServices() {
         return services;
     }
 
     public void setServices(LinkedHashSet<Service> services) {
         this.services = services;
-    }
-
-
-    public Selector getSelector() {
-        return selector;
-    }
-
-    public void setSelector(Selector selector) {
-        this.selector = selector;
     }
 
     @Override
@@ -70,10 +69,10 @@ public class Profile implements Nameable, Serializable {
     @Override
     public String toString() {
         return "Profile{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", services=" + services +
-                ", selector=" + selector +
                 '}';
     }
 

@@ -3,10 +3,10 @@ package com.pccw.ad.pronghorn.model.tc;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.pccw.ad.pronghorn.model.exception.TestCaseException;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.pccw.ad.pronghorn.model.profile.Service;
 
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,26 +16,51 @@ import static com.fasterxml.jackson.databind.annotation.JsonSerialize.Inclusion.
  * Created by FaustineP on 28/03/2017.
  */
 @JsonSerialize(include = NON_NULL)
-@Document
+@Entity
+@Table(name = "TBL_TESTCASE")
 public class TestCase implements Serializable {
 
+    private static final long serialVersionUID = 200614354L;
+
     @Id
-    @Indexed
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", unique = true, nullable = false)
+    private Long id;
+
+    @Column(name = "SERVICE_ID")
+    private Service service;
+
+    @Column(name = "IDENTIFIER", unique = true, nullable = false)
     private String identifier;
+
+    @Column(name = "OBJECTIVE", nullable = false)
     private String objective;
+
+    @Column(name = "PRE_CONDITION")
     private String preCondition;
+
+    @Column(name = "RESULT")
     private Result result;
+
+    @Column(name = "ACTIVE")
     private boolean isActive;
+
+    @Column(name = "AUTHOR")
     private String author;
-    @Indexed
+
+    @Column(name = "EXECUTED_BY")
     private String executedBy;
-    @Indexed
+
+    @Column(name = "STATUS")
+    @Enumerated(value = EnumType.STRING)
     private Status status;
+
+    @Column(name = "REMARKS")
     private String remarks;
+
+    @OneToMany
     private List<Script> scripts;
 
-    private static final long serialVersionUID = 200614354L;
 
     private TestCase(Builder builder) {
         this.author = builder.author;
@@ -112,18 +137,12 @@ public class TestCase implements Serializable {
         this.status = status;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @Override
     public String toString() {
         return "TestCase{" +
-                "identifier='" + identifier + '\'' +
+                "id=" + id +
+                ", service=" + service +
+                ", identifier='" + identifier + '\'' +
                 ", objective='" + objective + '\'' +
                 ", preCondition='" + preCondition + '\'' +
                 ", result=" + result +
