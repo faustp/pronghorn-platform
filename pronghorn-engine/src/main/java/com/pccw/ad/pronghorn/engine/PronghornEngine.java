@@ -2,7 +2,6 @@ package com.pccw.ad.pronghorn.engine;
 
 import com.pccw.ad.pronghorn.engine.action.ActionKeywords;
 import com.pccw.ad.pronghorn.message.Message;
-import com.pccw.ad.pronghorn.model.exception.ProfileException;
 import com.pccw.ad.pronghorn.model.profile.Profile;
 import com.pccw.ad.pronghorn.model.profile.Service;
 import com.pccw.ad.pronghorn.model.tc.Script;
@@ -38,8 +37,6 @@ public final class PronghornEngine extends PronghornEngineAbs {
         this.methods = actionKeywords.getClass().getMethods();
 
         for (Service service : this.profile.getServices()) {
-            // load service-specific selector
-            ActionKeywords.addSelector(profile.getSelector().getSelectors().get(service.getName()));
             String reportFileName = buildReportFilePath(service.getName());
             REPORT = new ExtentReports(reportFileName, false, DisplayOrder.OLDEST_FIRST);
 
@@ -55,7 +52,7 @@ public final class PronghornEngine extends PronghornEngineAbs {
                         }
                         testCase.setStatus(Status.ERROR);
                         clearResources();
-                        throw exception;
+                        break;
                     }
                 }
                 testCase.setStatus(Status.PASS);

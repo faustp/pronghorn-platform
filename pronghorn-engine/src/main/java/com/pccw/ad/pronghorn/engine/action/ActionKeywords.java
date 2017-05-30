@@ -1,9 +1,11 @@
 package com.pccw.ad.pronghorn.engine.action;
 
 
+import com.pccw.ad.pronghorn.common.validation.Validate;
 import com.pccw.ad.pronghorn.engine.data.Constant;
 import com.pccw.ad.pronghorn.engine.data.DocObjectModel;
 import com.pccw.ad.pronghorn.engine.exception.ActionKeywordException;
+import com.pccw.ad.pronghorn.model.tc.Script;
 import com.relevantcodes.extentreports.IExtentTestClass;
 import com.relevantcodes.extentreports.LogStatus;
 import org.apache.commons.io.FileUtils;
@@ -25,60 +27,50 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static com.pccw.ad.pronghorn.common.validation.Validate.isCSSSelector;
 import static com.pccw.ad.pronghorn.engine.data.Constant.OUTPUT_BASE_PATH;
 import static com.pccw.ad.pronghorn.engine.data.ObjectType.LIST_BOX;
 import static com.pccw.ad.pronghorn.engine.data.ObjectType.TXTBOX;
 
 
 /**
+ * This class contains all the methods pertaining to the event of particular DOM element
+ * <p>
  * Created by FaustineP on 07/03/2017.
  */
 public class ActionKeywords {
 
-    final static Logger logger = Logger.getLogger(ActionKeywords.class);
+    private final static Logger logger = Logger.getLogger(ActionKeywords.class);
 
     public static WebDriver WEB_DRIVER = null;
     public static App APP_DRIVER = null;
     public static Screen SCREEN = null;
 
-    public static HashMap<String, String> SELECTOR = new HashMap<>();
     public static HashMap<String, String> REPOSITORY = new HashMap<>();
 
-    public static void addSelector(HashMap<String, String> selector) {
-        SELECTOR.putAll(selector);
-    }
-
-    public static void clearSelector() {
-        SELECTOR.clear();
-    }
-
     /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @param script     Script object contains information that will be executed
      */
-    public static void openApplication(IExtentTestClass report, String description, String testCaseId,
-                                       String object, String data) {
+    public static void openApplication(IExtentTestClass report, Script script, String testCaseId) {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
-        switch (data) {
+
+        switch (script.getInputData()) {
             case "IE":
             case "Internet Explorer":
                 System.setProperty(Constant.KEY_IE_DRIVE, Constant.FILE_PATH_DRIVER_IE_X32_EXE);
                 capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
                 WEB_DRIVER = new InternetExplorerDriver(capabilities);
                 WEB_DRIVER.manage().window().maximize();
-                report.log(LogStatus.INFO, description, data.toUpperCase());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toLowerCase());
                 break;
             case "FF":
             case "FireFox":
                 System.setProperty(Constant.KEY_GECKO_DRIVER, Constant.FILE_PATH_GECKO_DRIVER_EXE);
                 WEB_DRIVER = new FirefoxDriver();
                 WEB_DRIVER.manage().window().maximize();
-                report.log(LogStatus.INFO, description, data.toUpperCase());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toUpperCase());
                 break;
             case "Chrome":
                 System.setProperty(Constant.KEY_CHROME_DRIVER, Constant.FILE_PATH_CHROME_DRIVER_EXE);
@@ -88,40 +80,25 @@ public class ActionKeywords {
                 capabilities.setCapability(ChromeOptions.CAPABILITY, options);
                 WEB_DRIVER = new ChromeDriver(capabilities);
                 WEB_DRIVER.manage().window().maximize();
-                report.log(LogStatus.INFO, description, data.toUpperCase());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toUpperCase());
                 break;
             default:
-                APP_DRIVER = App.open(data);
-                report.log(LogStatus.INFO, description, data.toUpperCase());
+                APP_DRIVER = App.open(script.getInputData());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toUpperCase());
         }
         WEB_DRIVER.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        logger.info("openApplication " + data);
+        logger.info("openApplication " + script.getInputData());
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void navigate(IExtentTestClass report, String description, String testCaseId,
-                                String object, String data) {
+
+    public static void navigate(IExtentTestClass report, Script script, String testCaseId) {
         WEB_DRIVER.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        WEB_DRIVER.get(data);
-        report.log(LogStatus.INFO, description, data);
-        logger.info("navigate " + data);
+        WEB_DRIVER.get(script.getInputData());
+        report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+        logger.info("navigate " + script.getInputData());
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void closeApplication(IExtentTestClass report, String description, String testCaseId,
-                                        String object, String data) {
+    public static void closeApplication(IExtentTestClass report, Script script, String testCaseId) {
 
         if (APP_DRIVER != null) {
             APP_DRIVER.close();
@@ -129,60 +106,45 @@ public class ActionKeywords {
         if (WEB_DRIVER != null) {
             WEB_DRIVER.quit();
         }
-        report.log(LogStatus.INFO, description, data);
+        report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
         logger.info("closing application...");
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void inputTxt(IExtentTestClass report, String description, String testCaseId,
-                                String object, String data) throws NoSuchElementException, FindFailed {
+    public static void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         try {
-            if (!isCSSSelector(SELECTOR.get(object).toLowerCase())) {
-                WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).clear();
-                WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).sendKeys(data);
+            if (Validate.isCSSSelector(script.getSelector().getValue())) {
+                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
+                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
             } else {
                 SCREEN = new Screen();
-                Pattern image = new Pattern(SELECTOR.get(object));
+                Pattern image = new Pattern(script.getSelector().getValue());
                 SCREEN.wait(image, 10);
                 SCREEN.click();
-                SCREEN.type(data);
+                SCREEN.type(script.getInputData());
             }
 
-            report.log(LogStatus.INFO, description, data);
-            logger.info("inputTxt [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("inputTxt [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException | FindFailed exception) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(exception);
             throw exception;
         }
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void click(IExtentTestClass report, String description, String testCaseId,
-                             String object, String data) throws FindFailed {
 
-        if (!isCSSSelector(SELECTOR.get(object).toLowerCase())) {
-            WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).click();
+    public static void click(IExtentTestClass report, Script script, String testCaseId) throws FindFailed, InterruptedException {
+        if (Validate.isCSSSelector(script.getSelector().getValue())) {
+            waitUntil(report, script, testCaseId);
+            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).click();
         } else {
             SCREEN = new Screen();
-            Pattern image = new Pattern(SELECTOR.get(object));
+            Pattern image = new Pattern(script.getSelector().getValue());
             try {
                 SCREEN.wait(image, 10);
                 SCREEN.click();
-                report.log(LogStatus.INFO, description, data);
-                logger.info("click [" + object + "]" + "[" + data + "]");
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+                logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
             } catch (FindFailed findFailed) {
                 logger.error(findFailed);
                 throw findFailed;
@@ -190,346 +152,283 @@ public class ActionKeywords {
         }
     }
 
-    public static void doubleClick(IExtentTestClass report, String description, String testCaseId,
-                                   String object, String data) throws FindFailed {
+
+    public static void doubleClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
         try {
             SCREEN = new Screen();
-            Pattern image = new Pattern(SELECTOR.get(object));
+            Pattern image = new Pattern(script.getSelector().getValue());
             SCREEN.wait(image, 10);
             SCREEN.doubleClick();
-            report.log(LogStatus.INFO, description, data);
-            logger.info("click [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (FindFailed findFailed) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(findFailed);
             throw findFailed;
         }
     }
 
-    public static void rightClick(IExtentTestClass report, String description, String testCaseId,
-                                  String object, String data) throws FindFailed {
+
+    public static void rightClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
 
         try {
             SCREEN = new Screen();
-            Pattern image = new Pattern(SELECTOR.get(object));
+            Pattern image = new Pattern(script.getSelector().getValue());
             SCREEN.wait(image, 10);
             SCREEN.rightClick();
-            report.log(LogStatus.INFO, description, data);
-            logger.info("click [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (FindFailed findFailed) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(findFailed);
             throw findFailed;
         }
     }
 
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void inputDate(IExtentTestClass report, String description, String testCaseId, String object,
-                                 String data) throws NoSuchElementException, FindFailed {
+    public static void inputDate(IExtentTestClass report, Script script, String testCaseId)
+            throws NoSuchElementException, FindFailed {
         // TODO : provide date format validation
         try {
-            if (!isCSSSelector(SELECTOR.get(object).toLowerCase())) {
-                WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).clear();
-                WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).sendKeys(data);
-                WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).sendKeys(Keys.TAB);
+            if (Validate.isCSSSelector(script.getSelector().getValue())) {
+                waitUntil(report, script, testCaseId);
+                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
+                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
+                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(Keys.TAB);
             } else {
                 SCREEN = new Screen();
-                Pattern image = new Pattern(SELECTOR.get(object));
+                Pattern image = new Pattern(script.getSelector().getValue());
                 SCREEN.wait(image, 10);
                 SCREEN.click();
-                SCREEN.type(data);
+                SCREEN.type(script.getInputData());
                 SCREEN.type(Key.TAB);
             }
 
-            report.log(LogStatus.INFO, description, data);
-            logger.info("inputDate [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("inputDate [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException | FindFailed exception) {
-            report.log(LogStatus.INFO, description, data);
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
             logger.error(exception);
             throw exception;
+        } catch (InterruptedException e) {
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.error(e);
         }
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void select(IExtentTestClass report, String description, String testCaseId, String object,
-                              String data) throws NoSuchElementException {
+
+    public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException,
+            InterruptedException {
         WebElement element = null;
         try {
-            element = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim())));
-            new Select(element).selectByVisibleText(data);
-            report.log(LogStatus.INFO, description, data);
-            logger.info("selectFromListBox [" + object + "]" + "[" + data + "]");
+            waitUntil(report, script, testCaseId);
+            element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+            new Select(element).selectByVisibleText(script.getInputData());
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException nsee) {
             logger.info("Failed to select from list box, trying to send keys instead");
             try {
                 if (element == null) {
                     throw nsee;
                 }
-                element.sendKeys(data);
-                logger.info("selectFromListBox [" + object + "]" + "[" + data + "]");
+                element.sendKeys(script.getInputData());
+                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
             } catch (NoSuchElementException nsee2) {
-                report.log(LogStatus.ERROR, description, data);
+                report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
                 logger.error(nsee2);
             }
         }
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void waitFor(IExtentTestClass report, String description, String testCaseId, String object,
-                               String data) throws InterruptedException {
+
+    public static void uploadFile(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, InterruptedException {
         try {
-            Thread.sleep(Long.valueOf(data));
-            logger.info("waitFor [" + data + "]");
-        } catch (InterruptedException ie) {
-            logger.error(ie);
-            throw ie;
+            waitUntil(report, script, testCaseId);
+            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
+            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
+            report.log(LogStatus.INFO, "Upload file[" + script.getInputData() + "]");
+            logger.info("uploadFile [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException | InterruptedException exception) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            logger.error(exception);
+            throw exception;
         }
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void uploadFile(IExtentTestClass report, String description, String testCaseId, String object,
-                                  String data) throws NoSuchElementException {
-        try {
-            WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).clear();
-            WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object.trim()))).sendKeys(data);
-            report.log(LogStatus.INFO, "Upload file[" + data + "]");
-            logger.info("uploadFile [" + object + "]" + "[" + data + "]");
-        } catch (NoSuchElementException nsee) {
-            report.log(LogStatus.ERROR, description, data);
-            logger.error(nsee);
-            throw nsee;
-        }
-    }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void snapShot(IExtentTestClass report, String description, String testCaseId, String object,
-                                String data) throws IOException {
+    public static void snapShot(IExtentTestClass report, Script script, String testCaseId) throws IOException {
         try {
             String FILE_PATH = OUTPUT_BASE_PATH.concat(File.separator).concat("snapshot").
                     concat(File.separator).concat(testCaseId.replaceAll("\\\\/", "\\")).
-                    concat(File.separator).concat(data + ".png");
+                    concat(File.separator).concat(script.getInputData() + ".png");
             File scrFile = ((TakesScreenshot) WEB_DRIVER).getScreenshotAs(OutputType.FILE);
             FileUtils.copyFile(scrFile, new File(FILE_PATH));
             String relativePath = FILE_PATH.replace(new File(OUTPUT_BASE_PATH).getParent(), "..\\..\\..");
-            report.log(LogStatus.INFO, data + "\t" + report.addScreenCapture(relativePath));
-            logger.info("snapShot [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getInputData() + "\t" + report.addScreenCapture(relativePath));
+            logger.info("snapShot [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (IOException ioe) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(ioe);
             throw ioe;
         }
     }
 
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void isContentEqualsTo(IExtentTestClass report, String description, String testCaseId,
-                                         String object, String data) {
-        try {
-            if (!isCSSSelector(SELECTOR.get(object).toLowerCase())) {
-                String strContent = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getText();
-                if (strContent.trim().equals(data)) {
-                    report.log(LogStatus.PASS, description, data);
-                } else {
-                    report.log(LogStatus.FAIL, description, data);
-                }
-            } else {
-                SCREEN = new Screen();
-                Pattern image = new Pattern(SELECTOR.get(object));
-                if (SCREEN.exists(image) != null) {
-                    report.log(LogStatus.PASS, description, data);
-                } else {
-                    report.log(LogStatus.FAIL, description, data);
-                }
-            }
-            logger.info("isContentEqualsTo [" + object + "]" + "[" + data + "]");
-        } catch (NoSuchElementException nsee) {
-            report.log(LogStatus.ERROR, description, data);
-            logger.error(nsee);
-            throw nsee;
-        }
-    }
-
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector to identify the CSS Selector path
-     * @param data        Input data
-     */
-    public static void isContentContains(IExtentTestClass report, String description, String testCaseId,
-                                         String object, String data) {
-        try {
-            String strContent = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getText();
-            if (strContent.trim().contains(data)) {
-                report.log(LogStatus.PASS, description, data);
-            } else {
-                report.log(LogStatus.FAIL, description, data);
-            }
-            logger.info("isContentContains [" + object + "]" + "[" + data + "]");
-        } catch (NoSuchElementException nsee) {
-            report.log(LogStatus.ERROR, description, data);
-            logger.error(nsee);
-            throw nsee;
-        }
-    }
-
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector where to get the info that will be stored
-     * @param data        Key property reference for the info
-     */
-    public static void storeInfo(IExtentTestClass report, String description, String testCaseId,
-                                 String object, String data) {
+    public static void storeInfo(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
         try {
             String info;
-            if (DocObjectModel.getType(object) == TXTBOX) {
-                info = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getAttribute("value");
-            } else if (DocObjectModel.getType(object) == LIST_BOX) {
-                Select selectItem = new Select(WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))));
+            if (DocObjectModel.getType(script.getSelector().getKey()) == TXTBOX) {
+                waitUntil(report, script, testCaseId);
+                info = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getAttribute("value");
+            } else if (DocObjectModel.getType(script.getSelector().getKey()) == LIST_BOX) {
+                Select selectItem = new Select(WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())));
                 info = selectItem.getFirstSelectedOption().getText();
             } else {
-                info = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getText();
+                info = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
             }
-            REPOSITORY.put(data, info);
-            report.log(LogStatus.INFO, description, data);
-            logger.info("storeInfo [" + object + "]" + "[" + data + "]");
-        } catch (NoSuchElementException nsee) {
-            report.log(LogStatus.ERROR, description, data);
-            logger.error(nsee);
-            throw nsee;
+            REPOSITORY.put(script.getInputData(), info);
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("storeInfo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException | InterruptedException exception) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            logger.error(exception);
+            throw exception;
         }
     }
 
-    /**
-     * @param report      IExtentTestClass interface for report logging
-     * @param description Step description based on test script .xlsx
-     * @param testCaseId  Test Case Identifier
-     * @param object      Key property selector where to put the retrieved info
-     * @param data        Key property of info that will be retrieved from REPOSITORY
-     */
-    public static void retrieveInfo(IExtentTestClass report, String description, String testCaseId,
-                                    String object, String data) {
+
+    public static void retrieveInfo(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
         try {
-            String info = REPOSITORY.get(data);
-            WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).sendKeys(info);
-            logger.info("retrieveInfo [" + object + "]" + "[" + data + "]");
-        } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
-            logger.error(ex);
-            throw ex;
+            String info = REPOSITORY.get(script.getInputData());
+            waitUntil(report, script, testCaseId);
+            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(info);
+            logger.info("retrieveInfo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException | InterruptedException exception) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            logger.error(exception);
+            throw exception;
         }
     }
 
-    public static void validateAttributeValue(IExtentTestClass report, String description, String testCaseId,
-                                              String object, String data) {
+
+    public static void validateAttributeValue(IExtentTestClass report, Script script, String testCaseId) {
         try {
-            String[] info = data.split(":");
+            String[] info = script.getInputData().split(":");
             String attr = null;
             String expectedValue = null;
             if (info.length > 1) {
                 attr = info[0].trim();
                 expectedValue = info[1].trim();
-                String attrActualValue = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getAttribute(attr);
+                String attrActualValue = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).
+                        getAttribute(attr);
                 if (Objects.equals(expectedValue, attrActualValue)) {
-                    report.log(LogStatus.PASS, description, expectedValue);
+                    report.log(LogStatus.PASS, script.getDescription(), expectedValue);
                 } else {
-                    report.log(LogStatus.FAIL, description, expectedValue);
+                    report.log(LogStatus.FAIL, script.getDescription(), expectedValue);
                 }
             } else {
-                report.log(LogStatus.ERROR, description, expectedValue);
+                report.log(LogStatus.ERROR, script.getDescription(), expectedValue);
             }
-            logger.info("validateAttributeValue [" + object + "]" + "[" + data + "]");
+            logger.info("validateAttributeValue [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, "");
+            report.log(LogStatus.ERROR, script.getDescription(), "");
             logger.error(ex);
             throw ex;
         }
     }
 
-    public static void isObjectPresent(IExtentTestClass report, String description, String testCaseId,
-                                       String object, String data) {
+
+    public static void isObjectPresent(IExtentTestClass report, Script script, String testCaseId) {
         boolean isFound = false;
         try {
-            WebElement element = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object)));
+            WebElement element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
             if (element.isDisplayed()) {
                 isFound = true;
             }
-            logger.info("isObjectPresent [" + object + "]" + "[" + data + "]");
+            logger.info("isObjectPresent [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException ignored) {
         } finally {
-            if (isFound == Boolean.valueOf(data)) {
-                report.log(LogStatus.PASS, description, data);
+            if (isFound == Boolean.valueOf(script.getInputData())) {
+                report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
             } else {
-                report.log(LogStatus.FAIL, description, data);
+                report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
             }
         }
     }
 
-    public static void validateStoredInfo(IExtentTestClass report, String description, String testCaseId,
-                                          String object, String data) {
+
+    public static void isContentEqualsTo(IExtentTestClass report, Script script, String testCaseId) {
         try {
-            String info = REPOSITORY.get(data);
-            String strContent = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getText();
-            if (strContent.trim().equals(info)) {
-                report.log(LogStatus.PASS, description, strContent + " is equal to" + info);
+            if (Validate.isCSSSelector(script.getSelector().getValue())) {
+                String strContent = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
+                if (strContent.trim().equals(script.getInputData())) {
+                    report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
+                } else {
+                    report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
+                }
             } else {
-                report.log(LogStatus.FAIL, description, strContent + " not equal to" + info);
+                SCREEN = new Screen();
+                Pattern image = new Pattern(script.getSelector().getValue());
+                if (SCREEN.exists(image) != null) {
+                    report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
+                } else {
+                    report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
+                }
             }
-            logger.info("validateStoredInfo [" + object + "]" + "[" + data + "]");
+            logger.info("isContentEqualsTo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException nsee) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            logger.error(nsee);
+            throw nsee;
+        }
+    }
+
+
+    public static void isContentContains(IExtentTestClass report, Script script, String testCaseId) {
+        try {
+            String strContent = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
+            if (strContent.trim().contains(script.getInputData())) {
+                report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
+            } else {
+                report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
+            }
+            logger.info("isContentContains [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException nsee) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            logger.error(nsee);
+            throw nsee;
+        }
+    }
+
+
+    public static void validateStoredInfo(IExtentTestClass report, Script script, String testCaseId) {
+        try {
+            String info = REPOSITORY.get(script.getInputData());
+            String strContent = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
+            if (strContent.trim().equals(info)) {
+                report.log(LogStatus.PASS, script.getDescription(), strContent + " is equal to" + info);
+            } else {
+                report.log(LogStatus.FAIL, script.getDescription(), strContent + " not equal to" + info);
+            }
+            logger.info("validateStoredInfo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(ex);
             throw ex;
         }
     }
 
-    public static void waitUntil(IExtentTestClass report, String description, String testCaseId,
-                                 String object, String data) throws InterruptedException {
+    /**
+     * This method perform implicit wait until the object that you are expecting appears
+     **/
+    public static void waitUntil(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
 
         WebDriverWait wait = new WebDriverWait(WEB_DRIVER, 90);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(SELECTOR.get(object))));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(script.getSelector().getValue())));
         try {
             Thread.sleep(1000);
-            logger.info("waitUntil [" + object + "]" + "[" + data + "]");
+            logger.info("waitUntil [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (InterruptedException e) {
             logger.error(e);
             throw e;
@@ -538,8 +437,33 @@ public class ActionKeywords {
 
     }
 
-    public static void updateSubscription(IExtentTestClass report, String description, String testCaseId,
-                                          String object, String data) {
+
+    /**
+     * @param report
+     * @param script
+     * @param testCaseId
+     * @throws InterruptedException
+     * @deprecated
+     */
+    @Deprecated
+    private static void waitFor(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
+        try {
+            Thread.sleep(Long.valueOf(script.getInputData()));
+            logger.info("waitFor [" + script.getInputData() + "]");
+        } catch (InterruptedException ie) {
+            logger.error(ie);
+            throw ie;
+        }
+    }
+
+
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void updateSubscription(IExtentTestClass report, Script script, String testCaseId) {
         try {
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#monthlyReportTable"));
             List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
@@ -551,10 +475,10 @@ public class ActionKeywords {
                     return;
                 }
             }
-            report.log(LogStatus.INFO, description, data);
-            logger.info("viewInternalDetails [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("viewInternalDetails [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
             logger.error(ake);
             throw ake;
@@ -562,29 +486,39 @@ public class ActionKeywords {
 
     }
 
-    public static void inputVerificationCode(IExtentTestClass report, String description, String testCaseId,
-                                             String object, String data) throws NoSuchElementException {
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void inputVerificationCode(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException {
         try {
-            String code = WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get(object))).getText();
-            WEB_DRIVER.findElement(By.cssSelector(SELECTOR.get("loginVerificationTxt"))).sendKeys(code);
-            report.log(LogStatus.INFO, description, data);
-            logger.info("inputVerification [" + object + "]" + "[" + data + "]");
+            String code = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
+            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(code);
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("inputVerification [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException nsee) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(nsee);
             throw nsee;
         }
     }
 
-    public static void findSubscription(IExtentTestClass report, String description, String testCaseId,
-                                        String object, String data) {
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void findSubscription(IExtentTestClass report, Script script, String testCaseId) {
         try {
             Thread.sleep(2000);
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#extProRequestTable"));
             List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
             boolean isFound = false;
             String subscriptionRefSource = null;
-            String subscriptionRefTarget = REPOSITORY.get(data);
+            String subscriptionRefTarget = REPOSITORY.get(script.getInputData());
             for (WebElement element : tableRows) {
                 List<WebElement> tableColumns = element.findElements(By.tagName("td"));
                 subscriptionRefSource = tableColumns.get(3).getText();
@@ -598,23 +532,28 @@ public class ActionKeywords {
             }
             if (isFound) {
                 String details = "Source = ".concat(subscriptionRefSource).concat(" Target = ").concat(subscriptionRefTarget);
-                report.log(LogStatus.PASS, description, details);
+                report.log(LogStatus.PASS, script.getDescription(), details);
 
             } else {
                 String details = "Source = ".concat(subscriptionRefSource).concat(" Target = ").concat(subscriptionRefTarget);
-                report.log(LogStatus.FAIL, description, details);
+                report.log(LogStatus.FAIL, script.getDescription(), details);
             }
-            logger.info("findSubscription [" + object + "]" + "[" + data + "]");
+            logger.info("findSubscription [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
             logger.error(ake);
             throw ake;
         }
     }
 
-    public static void viewInternalDetails(IExtentTestClass report, String description, String testCaseId,
-                                           String object, String data) {
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void viewInternalDetails(IExtentTestClass report, Script script, String testCaseId) {
         try {
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#srResultTable"));
             List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
@@ -626,24 +565,29 @@ public class ActionKeywords {
                     return;
                 }
             }
-            report.log(LogStatus.INFO, description, data);
-            logger.info("viewInternalDetails [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("viewInternalDetails [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
             logger.error(ake);
             throw ake;
         }
     }
 
-    public static void viewDetails(IExtentTestClass report, String description, String testCaseId,
-                                   String object, String data) {
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void viewDetails(IExtentTestClass report, Script script, String testCaseId) {
         try {
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#extProRequestTable"));
             List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
             for (WebElement element : tableRows) {
                 List<WebElement> tableColumns = element.findElements(By.tagName("td"));
-                List<WebElement> elements = tableColumns.get(Integer.valueOf(data)).findElements(By.tagName("a"));
+                List<WebElement> elements = tableColumns.get(Integer.valueOf(script.getInputData())).findElements(By.tagName("a"));
                 for (WebElement element1 : elements) {
                     if (element1.getAttribute("class").equalsIgnoreCase("pointCss")) {
                         element1.click();
@@ -651,25 +595,30 @@ public class ActionKeywords {
                     }
                 }
             }
-            report.log(LogStatus.INFO, description, "");
-            logger.info("viewDetails [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), "");
+            logger.info("viewDetails [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
             logger.error(ake);
             throw ake;
         }
     }
 
-    public static void cancelRequest(IExtentTestClass report, String description, String testCaseId,
-                                     String object, String data) {
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param testCaseId Test Case Identifier
+     * @deprecated This method is customized for BPSS and it will be removed soon
+     */
+    @Deprecated
+    public static void cancelRequest(IExtentTestClass report, Script script, String testCaseId) {
         try {
             Thread.sleep(2000);
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#extProRequestTable"));
             List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
             for (WebElement element : tableRows) {
                 List<WebElement> tableColumns = element.findElements(By.tagName("td"));
-                List<WebElement> elements = tableColumns.get(Integer.valueOf(data)).findElements(By.tagName("a"));
+                List<WebElement> elements = tableColumns.get(Integer.valueOf(script.getInputData())).findElements(By.tagName("a"));
                 for (WebElement element1 : elements) {
                     if (element1.getText().equalsIgnoreCase("cancel")) {
                         element1.click();
@@ -677,10 +626,10 @@ public class ActionKeywords {
                     }
                 }
             }
-            report.log(LogStatus.INFO, description, data);
-            logger.info("cancelRequest [" + object + "]" + "[" + data + "]");
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("cancelRequest [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (Exception ex) {
-            report.log(LogStatus.ERROR, description, data);
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
             logger.error(ake);
             throw ake;
