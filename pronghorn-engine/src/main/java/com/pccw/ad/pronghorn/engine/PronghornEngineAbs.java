@@ -44,8 +44,7 @@ public abstract class PronghornEngineAbs implements IEngine {
             throws InvocationTargetException, IllegalAccessException, FindFailed, NoSuchElementException, IOException {
         for (Method aMethod : this.methods) {
             if (aMethod.getName().equals(script.getAction())) {
-                aMethod.invoke(script.getAction(), test, script.getDescription(), testCaseId,
-                        script.getObjectKey(), script.getInputData());
+                aMethod.invoke(script.getAction(), test, script, testCaseId);
                 break;
             }
         }
@@ -65,9 +64,4 @@ public abstract class PronghornEngineAbs implements IEngine {
         ActionKeywords.REPOSITORY.clear();
     }
 
-    protected HashMap<String, String> loadSelectors(String name) {
-        HashMap<String, String> selectors = new HashMap<>();
-        selectors.putAll(profile.getSelector().getSelectors().get(name));
-        return selectors;
-    }
 }

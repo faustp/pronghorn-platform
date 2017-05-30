@@ -1,29 +1,44 @@
 package com.pccw.ad.pronghorn.model.tc;
 
 import com.pccw.ad.pronghorn.model.profile.Selector;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.*;
 import java.io.Serializable;
 
 /**
  * Created by FaustineP on 28/03/2017.
  */
-@Document
+@Entity
+@Table(name = "TBl_SCRIPT")
 public class Script implements Serializable {
 
     private static final long serialVersionUID = 200614354L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", unique = true, nullable = false)
+    private Long id;
+
+    @Column(name = "ACTION", nullable = false)
     private String action;
-    private String objectKey;
+
+    @Column(name = "SELECTOR_ID")
+    @JoinColumn(name = "SELECTOR_ID")
+    private Selector selector;
+
+    @Column(name = "INPUT_DATA")
     private String inputData;
+
+    @Column(name = "DESCRIPTION")
     private String description;
 
 
     public Script() {
     }
 
-    public Script(String description, String objectKey, String action, String inputData) {
+    public Script(String description, Selector selector, String action, String inputData) {
         this.action = action;
-        this.objectKey = objectKey;
+        this.selector = selector;
         this.inputData = inputData;
         this.description = description;
     }
@@ -36,12 +51,12 @@ public class Script implements Serializable {
         this.description = description;
     }
 
-    public String getObjectKey() {
-        return objectKey;
+    public Selector getSelector() {
+        return selector;
     }
 
-    public void setObjectKey(String objectKey) {
-        this.objectKey = objectKey;
+    public void setSelector(Selector selector) {
+        this.selector = selector;
     }
 
     public String getInputData() {
@@ -63,10 +78,11 @@ public class Script implements Serializable {
     @Override
     public String toString() {
         return "Script{" +
-                "description='" + description + '\'' +
-                ", objectKey='" + objectKey + '\'' +
+                "id=" + id +
                 ", action='" + action + '\'' +
+                ", selector=" + selector +
                 ", inputData='" + inputData + '\'' +
+                ", description='" + description + '\'' +
                 '}';
     }
 }

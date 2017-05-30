@@ -2,10 +2,9 @@ package com.pccw.ad.pronghorn.model.profile;
 
 import com.pccw.ad.pronghorn.model.exception.ServiceException;
 import com.pccw.ad.pronghorn.model.tc.TestCase;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,16 +13,28 @@ import java.util.Set;
 /**
  * Created by FaustineP on 06/04/2017.
  */
-@Document
+@Entity
+@Table(name = "TBL_SERVICE")
 public class Service implements Nameable, Serializable {
 
     private static final long serialVersionUID = 200614354L;
 
     @Id
-    @Indexed
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID", unique = true, nullable = false)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "PROFILE_ID")
+    private Profile profile;
+
+    @Column(name = "NAME", unique = true, nullable = false)
     private String name;
+
+    @Column(name = "DESCRIPTION")
     private String description;
+
+    @JoinColumn(name = "SERVICE_ID")
     private HashSet<TestCase> testCases;
 
     public Service() {
@@ -35,6 +46,22 @@ public class Service implements Nameable, Serializable {
             throw new ServiceException("test cases in Service must not be null or empty");
         this.name = name;
         this.testCases = testCases;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Profile getProfile() {
+        return profile;
+    }
+
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
 
     public Set<TestCase> getTestCases() {
