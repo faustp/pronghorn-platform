@@ -25,11 +25,11 @@ import org.sikuli.script.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static com.pccw.ad.pronghorn.engine.data.Constant.OUTPUT_BASE_PATH;
 import static com.pccw.ad.pronghorn.engine.data.ObjectType.LIST_BOX;
 import static com.pccw.ad.pronghorn.engine.data.ObjectType.TXTBOX;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 /**
@@ -42,8 +42,10 @@ public class ActionKeywords {
     private final static Logger logger = Logger.getLogger(ActionKeywords.class);
 
     public static WebDriver WEB_DRIVER = null;
-    public static App APP_DRIVER = null;
-    public static Screen SCREEN = null;
+    public static String PARENT_WINDOW = null;
+    public static int WINDOW_INDX;
+    private static App APP_DRIVER = null;
+
 
     public static HashMap<String, String> REPOSITORY = new HashMap<>();
 
@@ -63,6 +65,7 @@ public class ActionKeywords {
                 capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
                 WEB_DRIVER = new InternetExplorerDriver(capabilities);
                 WEB_DRIVER.manage().window().maximize();
+
                 report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toLowerCase());
                 break;
             case "FF":
@@ -86,13 +89,14 @@ public class ActionKeywords {
                 APP_DRIVER = App.open(script.getInputData());
                 report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toUpperCase());
         }
-        WEB_DRIVER.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        PARENT_WINDOW = WEB_DRIVER.getWindowHandle();
+        WEB_DRIVER.manage().timeouts().implicitlyWait(10, SECONDS);
         logger.info("openApplication " + script.getInputData());
     }
 
 
     public static void navigate(IExtentTestClass report, Script script, String testCaseId) {
-        WEB_DRIVER.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        WEB_DRIVER.manage().timeouts().implicitlyWait(10, SECONDS);
         WEB_DRIVER.get(script.getInputData());
         report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
         logger.info("navigate " + script.getInputData());
@@ -110,17 +114,26 @@ public class ActionKeywords {
         logger.info("closing application...");
     }
 
-    public static void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
+    public static  void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         try {
             if (Validate.isCSSSelector(script.getSelector().getValue())) {
-                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
-                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
+                WebElement txtElement;
+                try {
+                    txtElement = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+                } catch (NoSuchElementException nsee) {
+                    logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+                    logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+                    waitUntil(report, script, testCaseId);
+                    txtElement = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+                }
+                txtElement.clear();
+                txtElement.sendKeys(script.getInputData());
             } else {
-                SCREEN = new Screen();
+                Screen screen = new Screen();
                 Pattern image = new Pattern(script.getSelector().getValue());
-                SCREEN.wait(image, 10);
-                SCREEN.click();
-                SCREEN.type(script.getInputData());
+                screen.wait(image, 10);
+                screen.click();
+                screen.type(script.getInputData());
             }
 
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
@@ -135,14 +148,21 @@ public class ActionKeywords {
 
     public static void click(IExtentTestClass report, Script script, String testCaseId) throws FindFailed, InterruptedException {
         if (Validate.isCSSSelector(script.getSelector().getValue())) {
-            waitUntil(report, script, testCaseId);
-            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).click();
+            WebElement btnElement;
+            try {
+                btnElement = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+            } catch (NoSuchElementException nsee) {
+                logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+                logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+                btnElement = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+            }
+            btnElement.click();
         } else {
-            SCREEN = new Screen();
+            Screen screen = new Screen();
             Pattern image = new Pattern(script.getSelector().getValue());
             try {
-                SCREEN.wait(image, 10);
-                SCREEN.click();
+                screen.wait(image, 10);
+                screen.click();
                 report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
                 logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
             } catch (FindFailed findFailed) {
@@ -155,10 +175,10 @@ public class ActionKeywords {
 
     public static void doubleClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
         try {
-            SCREEN = new Screen();
+            Screen screen = new Screen();
             Pattern image = new Pattern(script.getSelector().getValue());
-            SCREEN.wait(image, 10);
-            SCREEN.doubleClick();
+            screen.wait(image, 10);
+            screen.doubleClick();
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
             logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (FindFailed findFailed) {
@@ -172,10 +192,10 @@ public class ActionKeywords {
     public static void rightClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
 
         try {
-            SCREEN = new Screen();
+            Screen screen = new Screen();
             Pattern image = new Pattern(script.getSelector().getValue());
-            SCREEN.wait(image, 10);
-            SCREEN.rightClick();
+            screen.wait(image, 10);
+            screen.rightClick();
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
             logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (FindFailed findFailed) {
@@ -191,17 +211,24 @@ public class ActionKeywords {
         // TODO : provide date format validation
         try {
             if (Validate.isCSSSelector(script.getSelector().getValue())) {
-                waitUntil(report, script, testCaseId);
-                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
-                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
-                WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(Keys.TAB);
+                WebElement dateElement;
+                try {
+                    dateElement = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+                } catch (NoSuchElementException nsee) {
+                    logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+                    logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+                    dateElement = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+                }
+                dateElement.clear();
+                dateElement.sendKeys(script.getInputData());
+                dateElement.sendKeys(Keys.TAB);
             } else {
-                SCREEN = new Screen();
+                Screen screen = new Screen();
                 Pattern image = new Pattern(script.getSelector().getValue());
-                SCREEN.wait(image, 10);
-                SCREEN.click();
-                SCREEN.type(script.getInputData());
-                SCREEN.type(Key.TAB);
+                screen.wait(image, 10);
+                screen.click();
+                screen.type(script.getInputData());
+                screen.type(Key.TAB);
             }
 
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
@@ -210,50 +237,102 @@ public class ActionKeywords {
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
             logger.error(exception);
             throw exception;
-        } catch (InterruptedException e) {
-            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
-            logger.error(e);
         }
     }
 
 
-    public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException,
-            InterruptedException {
+    public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException {
         WebElement element = null;
         try {
-            waitUntil(report, script, testCaseId);
             element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
-            new Select(element).selectByVisibleText(script.getInputData());
-            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
-            logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-        } catch (NoSuchElementException nsee) {
-            logger.info("Failed to select from list box, trying to send keys instead");
             try {
-                if (element == null) {
-                    throw nsee;
-                }
+                new Select(element).selectByVisibleText(script.getInputData());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+            } catch (NoSuchElementException nsee) {
+                logger.info("Failed to select from list box, trying to send keys instead");
                 element.sendKeys(script.getInputData());
                 logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+            }
+        } catch (NoSuchElementException nsee) {
+            logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+            logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+            element = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+            try {
+                new Select(element).selectByVisibleText(script.getInputData());
+                report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
             } catch (NoSuchElementException nsee2) {
-                report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
-                logger.error(nsee2);
+                logger.info("Failed to select from list box, trying to send keys instead");
+                element.sendKeys(script.getInputData());
+                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
             }
         }
     }
 
+    public static void switchToFrame(IExtentTestClass report, Script script, String testCaseId) {
+        WEB_DRIVER.switchTo().frame(WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())));
+        logger.info("Switching to frame -> " + script.getSelector().getKey());
+    }
 
-    public static void uploadFile(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, InterruptedException {
-        try {
-            waitUntil(report, script, testCaseId);
-            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).clear();
-            WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(script.getInputData());
-            report.log(LogStatus.INFO, "Upload file[" + script.getInputData() + "]");
-            logger.info("uploadFile [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-        } catch (NoSuchElementException | InterruptedException exception) {
-            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
-            logger.error(exception);
-            throw exception;
+    public static void switchToParentFrame(IExtentTestClass report, Script script, String testCaseId) {
+        WEB_DRIVER.switchTo().parentFrame();
+        logger.info("Switching to parent frame");
+    }
+
+    public static void switchToNextWindow(IExtentTestClass report, Script script, String testCaseId) {
+        WINDOW_INDX++;
+        Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
+        Object[] arr = activeWindows.toArray();
+        if (activeWindows.size() <= WINDOW_INDX) {
+            WEB_DRIVER.switchTo().window((String) arr[WINDOW_INDX]);
+        } else {
+            WEB_DRIVER.switchTo().window((String) arr[arr.length - 1]);
         }
+        logger.info("Switching to next window");
+    }
+
+    public static void switchToPrevWindow(IExtentTestClass report, Script script, String testCaseId) {
+        WINDOW_INDX--;
+        Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
+        Object[] arr = activeWindows.toArray();
+        if (activeWindows.size() <= WINDOW_INDX) {
+            if (WINDOW_INDX > 0) {
+                WEB_DRIVER.close();
+            }
+            WEB_DRIVER.switchTo().window((String) arr[WINDOW_INDX]);
+        } else {
+            WEB_DRIVER.switchTo().window((String) arr[arr.length - 1]);
+        }
+        logger.info("Switching to previous window");
+    }
+
+    public static void switchToParentWindow(IExtentTestClass report, Script script, String testCaseId) {
+        Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
+        Object[] arr = activeWindows.toArray();
+        int indx;
+        for (indx = 1; indx < arr.length; indx++) {
+            WEB_DRIVER.switchTo().window((String) arr[indx]);
+            WEB_DRIVER.close();
+        }
+        WEB_DRIVER.switchTo().window(PARENT_WINDOW);
+        logger.info("Switching to parent window");
+    }
+
+
+    public static void uploadFile(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException {
+        WebElement uploadFileElement;
+        try {
+            uploadFileElement = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+        } catch (NoSuchElementException exception) {
+            logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+            logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+            uploadFileElement = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+        }
+        uploadFileElement.clear();
+        uploadFileElement.sendKeys(script.getInputData());
+        report.log(LogStatus.INFO, "Upload file[" + script.getInputData() + "]");
+        logger.info("uploadFile [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
     }
 
 
@@ -275,11 +354,10 @@ public class ActionKeywords {
     }
 
 
-    public static void storeInfo(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
+    public static void storeInfo(IExtentTestClass report, Script script, String testCaseId) {
         try {
             String info;
             if (DocObjectModel.getType(script.getSelector().getKey()) == TXTBOX) {
-                waitUntil(report, script, testCaseId);
                 info = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getAttribute("value");
             } else if (DocObjectModel.getType(script.getSelector().getKey()) == LIST_BOX) {
                 Select selectItem = new Select(WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())));
@@ -290,7 +368,7 @@ public class ActionKeywords {
             REPOSITORY.put(script.getInputData(), info);
             report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
             logger.info("storeInfo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-        } catch (NoSuchElementException | InterruptedException exception) {
+        } catch (NoSuchElementException exception) {
             report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(exception);
             throw exception;
@@ -298,13 +376,12 @@ public class ActionKeywords {
     }
 
 
-    public static void retrieveInfo(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
+    public static void retrieveInfo(IExtentTestClass report, Script script, String testCaseId) {
         try {
             String info = REPOSITORY.get(script.getInputData());
-            waitUntil(report, script, testCaseId);
             WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).sendKeys(info);
             logger.info("retrieveInfo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-        } catch (NoSuchElementException | InterruptedException exception) {
+        } catch (NoSuchElementException exception) {
             report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
             logger.error(exception);
             throw exception;
@@ -348,6 +425,7 @@ public class ActionKeywords {
             }
             logger.info("isObjectPresent [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
         } catch (NoSuchElementException ignored) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
         } finally {
             if (isFound == Boolean.valueOf(script.getInputData())) {
                 report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
@@ -368,9 +446,9 @@ public class ActionKeywords {
                     report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
                 }
             } else {
-                SCREEN = new Screen();
+                Screen screen = new Screen();
                 Pattern image = new Pattern(script.getSelector().getValue());
-                if (SCREEN.exists(image) != null) {
+                if (screen.exists(image) != null) {
                     report.log(LogStatus.PASS, script.getDescription(), script.getInputData());
                 } else {
                     report.log(LogStatus.FAIL, script.getDescription(), script.getInputData());
@@ -422,21 +500,11 @@ public class ActionKeywords {
     /**
      * This method perform implicit wait until the object that you are expecting appears
      **/
-    public static void waitUntil(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
-
+    private static void waitUntil(IExtentTestClass report, Script script, String testCaseId) {
         WebDriverWait wait = new WebDriverWait(WEB_DRIVER, 90);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(script.getSelector().getValue())));
-        try {
-            Thread.sleep(1000);
-            logger.info("waitUntil [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-        } catch (InterruptedException e) {
-            logger.error(e);
-            throw e;
-        }
-
-
+        logger.info("waitUntil [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
     }
-
 
     /**
      * @param report
@@ -445,8 +513,7 @@ public class ActionKeywords {
      * @throws InterruptedException
      * @deprecated
      */
-    @Deprecated
-    private static void waitFor(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
+    public static void waitFor(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
         try {
             Thread.sleep(Long.valueOf(script.getInputData()));
             logger.info("waitFor [" + script.getInputData() + "]");
@@ -584,10 +651,10 @@ public class ActionKeywords {
     public static void viewDetails(IExtentTestClass report, Script script, String testCaseId) {
         try {
             WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#extProRequestTable"));
-            List<WebElement> tableRows = tableElement.findElements(By.tagName("tr"));
-            for (WebElement element : tableRows) {
-                List<WebElement> tableColumns = element.findElements(By.tagName("td"));
-                List<WebElement> elements = tableColumns.get(Integer.valueOf(script.getInputData())).findElements(By.tagName("a"));
+            List<WebElement> rows = tableElement.findElements(By.tagName("tr"));
+            for (WebElement element : rows) {
+                List<WebElement> columns = element.findElements(By.tagName("td"));
+                List<WebElement> elements = columns.get(Integer.valueOf(script.getInputData())).findElements(By.tagName("a"));
                 for (WebElement element1 : elements) {
                     if (element1.getAttribute("class").equalsIgnoreCase("pointCss")) {
                         element1.click();
@@ -634,5 +701,21 @@ public class ActionKeywords {
             logger.error(ake);
             throw ake;
         }
+    }
+
+    public static void navTable(IExtentTestClass report, Script script, String testCaseId) {
+        WebElement tableElement = WEB_DRIVER.findElement(By.cssSelector("#extProRequestTable"));
+        List<WebElement> rows = tableElement.findElements(By.tagName("tr"));
+        for (WebElement element : rows) {
+            List<WebElement> columns = element.findElements(By.tagName("td"));
+            List<WebElement> elements = columns.get(Integer.valueOf(script.getInputData())).findElements(By.tagName("a"));
+            for (WebElement element1 : elements) {
+                if (element1.getText().equalsIgnoreCase("cancel")) {
+                    element1.click();
+                    return;
+                }
+            }
+        }
+
     }
 }

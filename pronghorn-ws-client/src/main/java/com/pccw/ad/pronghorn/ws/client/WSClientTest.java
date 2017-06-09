@@ -1,7 +1,6 @@
 package com.pccw.ad.pronghorn.ws.client;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.data.mongodb.core.mapping.TextScore;
 
 
 

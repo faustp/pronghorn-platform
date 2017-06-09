@@ -39,8 +39,11 @@ public class TestCase implements Serializable {
     @Column(name = "PRE_CONDITION")
     private String preCondition;
 
-    @Column(name = "RESULT")
-    private Result result;
+    @Column(name = "ACTUAL_RESULT")
+    private String actualResult;
+
+    @Column(name = "EXPECTED_RESULT")
+    private String expectedResult;
 
     @Column(name = "ACTIVE")
     private boolean isActive;
@@ -69,8 +72,9 @@ public class TestCase implements Serializable {
         this.isActive = builder.isActive;
         this.objective = builder.objective;
         this.preCondition = builder.preCondition;
+        this.actualResult = builder.actualResult;
+        this.expectedResult = builder.expectedResult;
         this.remarks = builder.remarks;
-        this.result = builder.result;
         this.scripts = builder.scripts;
         this.status = builder.status;
     }
@@ -101,9 +105,6 @@ public class TestCase implements Serializable {
         return preCondition;
     }
 
-    public Result getResult() {
-        return result;
-    }
 
     public boolean isActive() {
         return isActive;
@@ -137,21 +138,27 @@ public class TestCase implements Serializable {
         this.status = status;
     }
 
+
+    public String getActualResult() {
+        return actualResult;
+    }
+
+    public String getExpectedResult() {
+        return expectedResult;
+    }
+
     @Override
     public String toString() {
         return "TestCase{" +
                 "id=" + id +
-                ", service=" + service +
                 ", identifier='" + identifier + '\'' +
                 ", objective='" + objective + '\'' +
                 ", preCondition='" + preCondition + '\'' +
-                ", result=" + result +
                 ", isActive=" + isActive +
                 ", author='" + author + '\'' +
                 ", executedBy='" + executedBy + '\'' +
                 ", status=" + status +
                 ", remarks='" + remarks + '\'' +
-                ", scripts=" + scripts +
                 '}';
     }
 
@@ -160,7 +167,8 @@ public class TestCase implements Serializable {
         private String identifier;
         private String objective;
         private String preCondition;
-        private Result result;
+        private String actualResult;
+        private String expectedResult;
         private boolean isActive;
         private String author;
         private String executedBy;
@@ -220,6 +228,16 @@ public class TestCase implements Serializable {
 
         public Builder addScripts(List<Script> scripts) {
             this.scripts = scripts;
+            return this;
+        }
+
+        public Builder addExpectedResult(String expectedResult) {
+            this.expectedResult = expectedResult;
+            return this;
+        }
+
+        public Builder addActualResult(String actualResult) {
+            this.actualResult = actualResult;
             return this;
         }
 

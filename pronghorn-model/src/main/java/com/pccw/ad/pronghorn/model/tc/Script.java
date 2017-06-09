@@ -19,6 +19,9 @@ public class Script implements Serializable {
     @Column(name = "ID", unique = true, nullable = false)
     private Long id;
 
+    @ManyToOne
+    private TestCase testCase;
+
     @Column(name = "ACTION", nullable = false)
     private String action;
 
@@ -31,7 +34,6 @@ public class Script implements Serializable {
 
     @Column(name = "DESCRIPTION")
     private String description;
-
 
     public Script() {
     }
@@ -73,6 +75,14 @@ public class Script implements Serializable {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public TestCase getTestCase() {
+        return testCase;
+    }
+
+    public void setTestCase(TestCase testCase) {
+        this.testCase = testCase;
     }
 
     @Override

@@ -6,11 +6,14 @@ import com.pccw.ad.pronghorn.message.helper.MessageFactory;
 import com.pccw.ad.pronghorn.model.exception.ProfileException;
 import com.pccw.ad.pronghorn.model.exception.ServiceException;
 import com.pccw.ad.pronghorn.model.exception.TestCaseException;
+import com.pccw.ad.pronghorn.model.profile.Service;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by FaustineP on 12/05/2017.
@@ -34,10 +37,19 @@ public class MessageSerializerTest {
         Message expectedMessage = messageMessageSerializer.deserialize(actualJsonStrMessage, Message.class);
 
         Assert.assertEquals(expectedMessage.getUuid(), actualMessage.getUuid());
+
         Assert.assertEquals(expectedMessage.getProfile().getName(), actualMessage.getProfile().getName());
+
         Assert.assertEquals(expectedMessage.getProfile().getServices().toString(),
                 actualMessage.getProfile().getServices().toString());
+
         Assert.assertEquals(expectedMessage.getRoute(), actualMessage.getRoute());
+
+        Set<Service> expectedServices = expectedMessage.getProfile().getServices();
+        Set<Service> actualServices = actualMessage.getProfile().getServices();
+
+        Assert.assertEquals(expectedServices.size(), actualServices.size());
+
     }
 
 
@@ -51,9 +63,17 @@ public class MessageSerializerTest {
         Message expectedMessage = messageMessageSerializer.deserialize(actualJsonStrMessage, Message.class);
 
         Assert.assertEquals(expectedMessage.getUuid(), actualMessage.getUuid());
+
         Assert.assertEquals(expectedMessage.getProfile().getName(), actualMessage.getProfile().getName());
+
         Assert.assertEquals(expectedMessage.getProfile().getServices().toString(),
                 actualMessage.getProfile().getServices().toString());
+
         Assert.assertEquals(expectedMessage.getRoute(), actualMessage.getRoute());
+
+        Set<Service> expectedServices = expectedMessage.getProfile().getServices();
+        Set<Service> actualServices = actualMessage.getProfile().getServices();
+
+        Assert.assertEquals(expectedServices.size(), actualServices.size());
     }
 }

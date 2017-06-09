@@ -18,7 +18,7 @@ public class Validate {
     }
 
     public static boolean isCSSSelector(String filename){
-        String pattern = ".?\\.(png|jpg|bmp|jpeg|tiff)";
-        return filename.toLowerCase().matches(pattern);
+        String pattern = "[a-z]?:(\\\\(.*))?\\.(png|jpg|bmp|jpeg|tiff)?";
+        return !filename.toLowerCase().matches(pattern);
     }
 }

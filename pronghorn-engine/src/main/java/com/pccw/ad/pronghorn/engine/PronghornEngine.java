@@ -46,7 +46,7 @@ public final class PronghornEngine extends PronghornEngineAbs {
                     try {
                         executeScript(TEST, script, testCase.getIdentifier());
                     } catch (InvocationTargetException | IllegalAccessException | FindFailed | IOException exception) {
-                        logger.error(exception);
+                        logger.error(exception.getCause());
                         if (ActionKeywords.WEB_DRIVER != null) {
                             ActionKeywords.WEB_DRIVER.quit();
                         }

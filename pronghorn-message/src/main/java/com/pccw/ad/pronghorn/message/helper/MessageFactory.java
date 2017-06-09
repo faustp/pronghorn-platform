@@ -34,8 +34,10 @@ public class MessageFactory {
     }
 
     private static Profile generateProfile() throws ProfileException, ServiceException, TestCaseException {
-        Profile profile = new Profile(generateString(), generateService(1));
-        profile.setSelector(new Selector(generateSelectors(3)));
+        Profile profile = new Profile();
+        profile.setId((long) generateNumber(1, 4));
+        profile.setName(generateString());
+        profile.setServices(generateService(3));
         return profile;
     }
 
@@ -71,7 +73,11 @@ public class MessageFactory {
     private static List<Script> generateScript(int count) {
         List<Script> scripts = new ArrayList<>();
         for (int ctr = 0; ctr <= count; ctr++) {
-            Script script = new Script(generateString(), generateString(), generateString(), generateString());
+            Script script = new Script();
+            script.setAction(generateString());
+            script.setDescription(generateString());
+            script.setInputData(generateString());
+            script.setSelector(generateSelector());
             scripts.add(script);
         }
         return scripts;
@@ -97,5 +103,12 @@ public class MessageFactory {
             selectors.put("global", selector);
         }
         return selectors;
+    }
+
+    private static Selector generateSelector() {
+        Selector selector = new Selector();
+        selector.setKey(generateString());
+        selector.setValue(generateString());
+        return selector;
     }
 }

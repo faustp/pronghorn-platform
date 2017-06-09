@@ -1,7 +1,6 @@
 package com.pccw.ad.pronghorn.ws.repository;
 
 import com.pccw.ad.pronghorn.model.profile.Profile;
-import com.pccw.ad.pronghorn.model.profile.Service;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 

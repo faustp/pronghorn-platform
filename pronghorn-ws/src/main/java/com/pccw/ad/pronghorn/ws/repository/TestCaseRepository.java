@@ -1,7 +1,6 @@
 package com.pccw.ad.pronghorn.ws.repository;
 
 import com.pccw.ad.pronghorn.model.tc.TestCase;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 

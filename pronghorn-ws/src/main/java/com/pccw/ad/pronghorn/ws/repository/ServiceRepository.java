@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * Created by FaustineP on 23/05/2017.
  */
 @Repository
-public interface ServiceRepository extends PagingAndSortingRepository<Service, String> {
+public interface ServiceRepository extends PagingAndSortingRepository<Service, Long> {
 
     Service findServiceByName(String name);
 
