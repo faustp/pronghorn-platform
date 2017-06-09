@@ -35,4 +35,13 @@ public class TestCaseService {
         testCaseRepository.save(testCase);
         return "202";
     }
+
+    public ResponseMessage<TestCase> updateTestCase(TestCase testCase) {
+        testCaseRepository.save(testCase);
+        return new ResponseMessage(202, "success", testCase);
+    }
+
+    public ResponseMessage<TestCase> getTestCase(String testId) {
+        return new ResponseMessage<>(200, "success", testCaseRepository.findByIdentifier(testId));
+    }
 }
