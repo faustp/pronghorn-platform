@@ -114,7 +114,7 @@ public class ActionKeywords {
         logger.info("closing application...");
     }
 
-    public static  void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
+    public static void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         try {
             if (Validate.isCSSSelector(script.getSelector().getValue())) {
                 WebElement txtElement;
@@ -240,20 +240,39 @@ public class ActionKeywords {
         }
     }
 
-
-    public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException {
+    public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         WebElement element = null;
         try {
-            element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
-            try {
-                new Select(element).selectByVisibleText(script.getInputData());
-                report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
-                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
-            } catch (NoSuchElementException nsee) {
-                logger.info("Failed to select from list box, trying to send keys instead");
-                element.sendKeys(script.getInputData());
-                logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+            if (Validate.isCSSSelector(script.getSelector().getValue())) {
+                element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+                try {
+                    new Select(element).selectByVisibleText(script.getInputData());
+                    report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+                    logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+                } catch (NoSuchElementException nsee) {
+                    logger.info("Failed to select from list box, trying to send keys instead");
+                    element.sendKeys(script.getInputData());
+                    logger.info("selectFromListBox [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+                }
+            } else {
+                Screen screen = new Screen();
+                Pattern image = new Pattern(script.getSelector().getValue());
+                try {
+                    screen.wait(image, 10);
+                    screen.click();
+                    Region r = screen.find(image);
+                    screen.click(r.offset(170, 0));
+                    screen.type(script.getInputData());
+                    screen.type(Key.ENTER);
+
+                    report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+                    logger.info("click [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+                } catch (FindFailed findFailed) {
+                    logger.error(findFailed);
+                    throw findFailed;
+                }
             }
+
         } catch (NoSuchElementException nsee) {
             logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
             logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
@@ -715,6 +734,22 @@ public class ActionKeywords {
                     return;
                 }
             }
+        }
+
+    }
+
+    public static void clickAlert(IExtentTestClass report, Script script, String testCaseId) {
+        try {
+            Alert alert = WEB_DRIVER.switchTo().alert();
+            if(script.getInputData().equalsIgnoreCase("OK"))
+                alert.accept();
+            else
+                alert.dismiss();
+        } catch (Exception ex) {
+            report.log(LogStatus.ERROR, script.getDescription(), script.getInputData());
+            ActionKeywordException ake = new ActionKeywordException(Arrays.toString(ex.getStackTrace()), ex.getCause());
+            logger.error(ake);
+            throw ake;
         }
 
     }
