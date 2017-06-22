@@ -3,6 +3,9 @@ package com.pccw.ad.pronghorn.wrapper.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pccw.ad.pronghorn.message.Message;
+import com.pccw.ad.pronghorn.mq.client.IMQClient;
+import com.pccw.ad.pronghorn.mq.client.MQClient;
+import com.pccw.ad.pronghorn.mq.client.exception.MQClientException;
 import com.pccw.ad.pronghorn.wrapper.MQWrapper;
 import com.pccw.ad.pronghorn.wrapper.exception.MQWrapperException;
 import com.pccw.ad.pronghorn.wrapper.profile.MQExchange;
@@ -21,6 +24,7 @@ public abstract class MQWrapperAbs implements MQWrapper {
 
 
     private static ConnectionFactory factory = null;
+    private static MQClient imqClient;
     private static Connection connection = null;
     private static Channel channel = null;
     public static boolean FORCE_SHUTDOWN;
@@ -28,10 +32,11 @@ public abstract class MQWrapperAbs implements MQWrapper {
     static protected Properties MQ_PROP = new Properties();
 
 
-    public MQWrapperAbs(String name) throws IOException, MQWrapperException, TimeoutException {
+    public MQWrapperAbs(String name) throws IOException, MQWrapperException, TimeoutException, MQClientException {
         loadMQProperties(name);
         setMQExchange();
         initialize();
+        imqClient = new MQClient("");
     }
 
     protected static void loadMQProperties(String name) throws IOException, MQWrapperException {
@@ -97,10 +102,8 @@ public abstract class MQWrapperAbs implements MQWrapper {
                 if (message == null) continue;
                 consumer.doWork(message);
             }
-            if (FORCE_SHUTDOWN) {
-                channel.close();
-                connection.close();
-            }
+            channel.close();
+            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

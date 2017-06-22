@@ -5,7 +5,7 @@ import com.pccw.ad.pronghorn.engine.IEngine;
 import com.pccw.ad.pronghorn.engine.PronghornEngine;
 import com.pccw.ad.pronghorn.message.Message;
 import com.pccw.ad.pronghorn.model.exception.ProfileException;
-import com.pccw.ad.pronghorn.model.profile.Profile;
+import com.pccw.ad.pronghorn.mq.client.exception.MQClientException;
 import com.pccw.ad.pronghorn.wrapper.exception.MQWrapperException;
 import org.sikuli.script.FindFailed;
 
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 public class ConsumerImpl extends MQWrapperAbs {
 
 
-    public ConsumerImpl(String name) throws IOException, MQWrapperException, TimeoutException {
+    public ConsumerImpl(String name) throws IOException, MQWrapperException, TimeoutException, MQClientException {
         super(name);
     }
 
@@ -28,11 +28,7 @@ public class ConsumerImpl extends MQWrapperAbs {
         IEngine pronghornEngine = new PronghornEngine((Message) message);
         try {
             pronghornEngine.execute();
-        } catch (ProfileException | InvocationTargetException | IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (FindFailed findFailed) {
-            findFailed.printStackTrace();
-        } catch (IOException e) {
+        } catch (ProfileException | InvocationTargetException | IllegalAccessException | FindFailed | IOException e) {
             e.printStackTrace();
         }
         return (Message) message;

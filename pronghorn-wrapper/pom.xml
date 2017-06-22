@@ -43,6 +43,11 @@
             <artifactId>amqp-client</artifactId>
             <version>3.6.5</version>
         </dependency>
+        <dependency>
+            <groupId>com.pccw.pronghorn</groupId>
+            <artifactId>pronghorn-mq-client</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 </project>

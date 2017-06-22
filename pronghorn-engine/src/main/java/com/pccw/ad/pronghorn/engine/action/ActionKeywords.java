@@ -16,6 +16,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -51,8 +52,8 @@ public class ActionKeywords {
 
     /**
      * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
      * @param testCaseId Test Case Identifier
-     * @param script     Script object contains information that will be executed
      */
     public static void openApplication(IExtentTestClass report, Script script, String testCaseId) {
 
@@ -95,6 +96,11 @@ public class ActionKeywords {
     }
 
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void navigate(IExtentTestClass report, Script script, String testCaseId) {
         WEB_DRIVER.manage().timeouts().implicitlyWait(10, SECONDS);
         WEB_DRIVER.get(script.getInputData());
@@ -102,6 +108,11 @@ public class ActionKeywords {
         logger.info("navigate " + script.getInputData());
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void closeApplication(IExtentTestClass report, Script script, String testCaseId) {
 
         if (APP_DRIVER != null) {
@@ -114,6 +125,11 @@ public class ActionKeywords {
         logger.info("closing application...");
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void inputTxt(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         try {
             if (Validate.isCSSSelector(script.getSelector().getValue())) {
@@ -146,6 +162,11 @@ public class ActionKeywords {
     }
 
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void click(IExtentTestClass report, Script script, String testCaseId) throws FindFailed, InterruptedException {
         if (Validate.isCSSSelector(script.getSelector().getValue())) {
             WebElement btnElement;
@@ -173,6 +194,11 @@ public class ActionKeywords {
     }
 
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void doubleClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
         try {
             Screen screen = new Screen();
@@ -189,6 +215,11 @@ public class ActionKeywords {
     }
 
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void rightClick(IExtentTestClass report, Script script, String testCaseId) throws FindFailed {
 
         try {
@@ -206,6 +237,11 @@ public class ActionKeywords {
     }
 
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void inputDate(IExtentTestClass report, Script script, String testCaseId)
             throws NoSuchElementException, FindFailed {
         // TODO : provide date format validation
@@ -240,6 +276,11 @@ public class ActionKeywords {
         }
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void select(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException, FindFailed {
         WebElement element = null;
         try {
@@ -289,16 +330,31 @@ public class ActionKeywords {
         }
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void switchToFrame(IExtentTestClass report, Script script, String testCaseId) {
         WEB_DRIVER.switchTo().frame(WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())));
         logger.info("Switching to frame -> " + script.getSelector().getKey());
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void switchToParentFrame(IExtentTestClass report, Script script, String testCaseId) {
         WEB_DRIVER.switchTo().parentFrame();
         logger.info("Switching to parent frame");
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void switchToNextWindow(IExtentTestClass report, Script script, String testCaseId) {
         WINDOW_INDX++;
         Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
@@ -311,6 +367,11 @@ public class ActionKeywords {
         logger.info("Switching to next window");
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void switchToPrevWindow(IExtentTestClass report, Script script, String testCaseId) {
         WINDOW_INDX--;
         Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
@@ -326,6 +387,11 @@ public class ActionKeywords {
         logger.info("Switching to previous window");
     }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void switchToParentWindow(IExtentTestClass report, Script script, String testCaseId) {
         Set<String> activeWindows = WEB_DRIVER.getWindowHandles();
         Object[] arr = activeWindows.toArray();
@@ -338,7 +404,11 @@ public class ActionKeywords {
         logger.info("Switching to parent window");
     }
 
-
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void uploadFile(IExtentTestClass report, Script script, String testCaseId) throws NoSuchElementException {
         WebElement uploadFileElement;
         try {
@@ -354,7 +424,11 @@ public class ActionKeywords {
         logger.info("uploadFile [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
     }
 
-
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void snapShot(IExtentTestClass report, Script script, String testCaseId) throws IOException {
         try {
             String FILE_PATH = OUTPUT_BASE_PATH.concat(File.separator).concat("snapshot").
@@ -393,6 +467,7 @@ public class ActionKeywords {
             throw exception;
         }
     }
+
 
 
     public static void retrieveInfo(IExtentTestClass report, Script script, String testCaseId) {
@@ -434,7 +509,11 @@ public class ActionKeywords {
         }
     }
 
-
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void isObjectPresent(IExtentTestClass report, Script script, String testCaseId) {
         boolean isFound = false;
         try {
@@ -454,7 +533,11 @@ public class ActionKeywords {
         }
     }
 
-
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void isContentEqualsTo(IExtentTestClass report, Script script, String testCaseId) {
         try {
             if (Validate.isCSSSelector(script.getSelector().getValue())) {
@@ -481,7 +564,18 @@ public class ActionKeywords {
         }
     }
 
+    public static void hoverTo(IExtentTestClass report, Script script, String testCaseId){
+        WebElement element = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+        Actions actions = new Actions(WEB_DRIVER);
+        actions.moveToElement(element).perform();
+        logger.info("hoverTo [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+    }
 
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void isContentContains(IExtentTestClass report, Script script, String testCaseId) {
         try {
             String strContent = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue())).getText();
@@ -498,7 +592,11 @@ public class ActionKeywords {
         }
     }
 
-
+    /**
+     * @param report     IExtentTestClass interface for report logging
+     * @param script     Script object contains information such as object key, value, actionKeyword and input data
+     * @param testCaseId Test Case Identifier
+     */
     public static void validateStoredInfo(IExtentTestClass report, Script script, String testCaseId) {
         try {
             String info = REPOSITORY.get(script.getInputData());
@@ -741,7 +839,7 @@ public class ActionKeywords {
     public static void clickAlert(IExtentTestClass report, Script script, String testCaseId) {
         try {
             Alert alert = WEB_DRIVER.switchTo().alert();
-            if(script.getInputData().equalsIgnoreCase("OK"))
+            if (script.getInputData().equalsIgnoreCase("OK"))
                 alert.accept();
             else
                 alert.dismiss();
