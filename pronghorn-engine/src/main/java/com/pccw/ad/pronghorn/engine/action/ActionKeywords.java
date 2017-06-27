@@ -161,7 +161,6 @@ public class ActionKeywords {
         }
     }
 
-
     /**
      * @param report     IExtentTestClass interface for report logging
      * @param script     Script object contains information such as object key, value, actionKeyword and input data
@@ -850,5 +849,28 @@ public class ActionKeywords {
             throw ake;
         }
 
+    }
+
+    public static void clearField(IExtentTestClass report, Script script, String testCaseId) {
+        try {
+            WebElement dateElement;
+            try {
+                dateElement = WEB_DRIVER.findElement(By.cssSelector(script.getSelector().getValue()));
+            } catch (NoSuchElementException nsee) {
+                logger.info("Element [" + script.getSelector().getKey() + "] failed to locate using CSS selector.");
+                logger.info("Locating element [" + script.getSelector().getKey() + "] by id...");
+                dateElement = WEB_DRIVER.findElement(By.id(script.getSelector().getValue()));
+            }
+
+            dateElement.sendKeys(Keys.HOME,Keys.chord(Keys.SHIFT,Keys.END), "");
+            dateElement.sendKeys(Keys.DELETE);
+
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.info("inputDate [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
+        } catch (NoSuchElementException exception) {
+            report.log(LogStatus.INFO, script.getDescription(), script.getInputData());
+            logger.error(exception);
+            throw exception;
+        }
     }
 }
