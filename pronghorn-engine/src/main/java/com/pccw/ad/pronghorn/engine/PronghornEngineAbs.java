@@ -25,20 +25,19 @@ public abstract class PronghornEngineAbs implements IEngine {
 
     protected Message message;
     protected Profile profile;
-    protected static ExtentTest TEST;
-    protected static ExtentReports REPORT;
+    protected ExtentTest TEST;
+    protected ExtentReports REPORT;
     protected Method[] methods;
 
 
     public PronghornEngineAbs(Message message) {
         this.message = message;
-        this.profile = message.getProfile();
+        this.profile = this.message.getProfile();
     }
 
     public PronghornEngineAbs(Profile profile) {
         this.profile = profile;
     }
-
 
     protected void executeScript(IExtentTestClass test, Script script, String testCaseId)
             throws InvocationTargetException, IllegalAccessException, FindFailed, NoSuchElementException, IOException {
