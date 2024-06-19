@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>pronghorn-platform</artifactId>
-        <groupId>com.pccw.pronghorn</groupId>
+        <groupId>com.faust.pronghorn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -19,12 +19,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.pccw.pronghorn</groupId>
+            <groupId>com.faust.pronghorn</groupId>
             <artifactId>pronghorn-model</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.pccw.pronghorn</groupId>
+            <groupId>com.faust.pronghorn</groupId>
             <artifactId>pronghorn-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -38,6 +38,13 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.23.1</version>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>org.junit.jupiter</groupId>-->
             <!--<artifactId>junit-jupiter-api</artifactId>-->

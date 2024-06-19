@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>pronghorn-platform</artifactId>
-        <groupId>com.pccw.pronghorn</groupId>
+        <groupId>com.faust.pronghorn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -18,13 +18,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.pccw.pronghorn</groupId>
+            <groupId>com.faust.pronghorn</groupId>
             <artifactId>pronghorn-message</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.pccw.pronghorn</groupId>
+            <groupId>com.faust.pronghorn</groupId>
             <artifactId>pronghorn-engine</artifactId>
             <version>1.0.1-SNAPSHOT</version>
         </dependency>
@@ -43,7 +43,7 @@
             <version>5.17.1</version>
         </dependency>
         <dependency>
-            <groupId>com.pccw.pronghorn</groupId>
+            <groupId>com.faust.pronghorn</groupId>
             <artifactId>pronghorn-mq-client</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

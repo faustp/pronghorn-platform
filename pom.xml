@@ -15,7 +15,7 @@
         <java.version>19</java.version>
     </properties>
 
-    <groupId>com.pccw.pronghorn</groupId>
+    <groupId>com.faust.pronghorn</groupId>
     <artifactId>pronghorn-platform</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -34,7 +34,6 @@
     <developers>
         <developer>
             <name>Faustine Padit</name>
-            <email>faustinechristopher.padit@pccw.com</email>
             <roles>
                 <role>Solutions Analyst</role>
             </roles>
