@@ -18,6 +18,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -25,6 +26,7 @@ import org.sikuli.script.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 
 import static com.pccw.ad.pronghorn.engine.data.Constant.OUTPUT_BASE_PATH;
@@ -64,7 +66,7 @@ public class ActionKeywords {
             case "Internet Explorer":
                 System.setProperty(Constant.KEY_IE_DRIVE, Constant.FILE_PATH_DRIVER_IE_X32_EXE);
                 capabilities.setCapability(InternetExplorerDriver.IE_ENSURE_CLEAN_SESSION, true);
-                WEB_DRIVER = new InternetExplorerDriver(capabilities);
+                WEB_DRIVER = RemoteWebDriver.builder().addAlternative(capabilities).build();
                 WEB_DRIVER.manage().window().maximize();
 
                 report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toLowerCase());
@@ -78,11 +80,11 @@ public class ActionKeywords {
                 break;
             case "Chrome":
                 System.setProperty(Constant.KEY_CHROME_DRIVER, Constant.FILE_PATH_CHROME_DRIVER_EXE);
-                capabilities = DesiredCapabilities.chrome();
+                capabilities.setCapability(ChromeDriver.IS_CHROMIUM_BROWSER.toString(),true);
                 ChromeOptions options = new ChromeOptions();
                 options.addArguments("test-type");
                 capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                WEB_DRIVER = new ChromeDriver(capabilities);
+                WEB_DRIVER = RemoteWebDriver.builder().addAlternative(capabilities).build();
                 WEB_DRIVER.manage().window().maximize();
                 report.log(LogStatus.INFO, script.getDescription(), script.getInputData().toUpperCase());
                 break;
@@ -617,7 +619,7 @@ public class ActionKeywords {
      * This method perform implicit wait until the object that you are expecting appears
      **/
     private static void waitUntil(IExtentTestClass report, Script script, String testCaseId) {
-        WebDriverWait wait = new WebDriverWait(WEB_DRIVER, 90);
+        WebDriverWait wait = new WebDriverWait(WEB_DRIVER, Duration.ofSeconds(90));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(script.getSelector().getValue())));
         logger.info("waitUntil [" + script.getSelector().getKey() + "]" + "[" + script.getInputData() + "]");
     }
@@ -627,7 +629,7 @@ public class ActionKeywords {
      * @param script
      * @param testCaseId
      * @throws InterruptedException
-     * @deprecated
+     * @Deprecated
      */
     public static void waitFor(IExtentTestClass report, Script script, String testCaseId) throws InterruptedException {
         try {

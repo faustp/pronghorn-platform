@@ -4,9 +4,6 @@ package com.pccw.ad.pronghorn.mq.client;
 import com.pccw.ad.pronghorn.common.exception.MessageSerializerException;
 import com.pccw.ad.pronghorn.message.Message;
 import com.pccw.ad.pronghorn.message.helper.MessageFactory;
-import com.pccw.ad.pronghorn.model.exception.ProfileException;
-import com.pccw.ad.pronghorn.model.exception.ServiceException;
-import com.pccw.ad.pronghorn.model.exception.TestCaseException;
 import com.pccw.ad.pronghorn.mq.client.exception.MQClientException;
 import org.junit.Test;
 
@@ -22,7 +19,7 @@ public class MQClientTest {
     MQClient<Message> mqClient;
 
     @Test
-    public void sendMessage() throws MQClientException, IOException, TimeoutException, TestCaseException, ServiceException, ProfileException, ExecutionException, InterruptedException {
+    public void sendMessage() throws MQClientException, IOException, TimeoutException, ExecutionException, InterruptedException {
         String configFile = new File(System.getProperty("user.dir")).getParent().concat(File.separator).
                 concat("config").concat(File.separator);
         mqClient = new MQClient<>(configFile.concat("consumer.properties"));
